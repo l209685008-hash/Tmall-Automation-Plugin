@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>模拟天猫商品发布页</title>
+    <style>
+      body {
+        margin: 24px;
+        color: #17202c;
+        font: 14px/1.5 system-ui, sans-serif;
+      }
+      .form {
+        max-width: 920px;
+        margin-left: 320px;
+      }
+      .left-helper {
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        width: 260px;
+        padding: 14px;
+        border-radius: 8px;
+        background: #f5f7fb;
+      }
+      .left-helper img {
+        display: block;
+        width: 220px;
+        height: 160px;
+        border: 1px solid #ccd3df;
+        border-radius: 6px;
+        background: #dde5f2;
+      }
+      .form-item {
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: 10px;
+        align-items: start;
+        margin-bottom: 14px;
+      }
+      label {
+        font-weight: 700;
+      }
+      input,
+      textarea,
+      button {
+        font: inherit;
+      }
+      input,
+      textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccd3df;
+        border-radius: 6px;
+      }
+      .select {
+        position: relative;
+      }
+      .select [role="combobox"] {
+        width: 100%;
+        min-height: 34px;
+        text-align: left;
+        border: 1px solid #ccd3df;
+        border-radius: 6px;
+        background: #fff;
+      }
+      .options {
+        display: none;
+        position: absolute;
+        z-index: 2;
+        top: 38px;
+        left: 0;
+        right: 0;
+        max-height: 180px;
+        overflow: auto;
+        border: 1px solid #ccd3df;
+        border-radius: 6px;
+        background: #fff;
+        box-shadow: 0 8px 20px rgb(16 24 40 / 0.12);
+      }
+      .open .options {
+        display: block;
+      }
+      [role="option"] {
+        padding: 8px 10px;
+        cursor: pointer;
+      }
+      [role="option"][aria-selected="true"] {
+        background: #e8f1ff;
+        color: #0a4ca5;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        border: 1px solid #d9dee8;
+        padding: 6px;
+      }
+      .actions {
+        margin-top: 24px;
+      }
+      #uploadedFileName {
+        margin: 8px 0;
+        color: #0a4ca5;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 10;
+        inset: 80px 120px auto;
+        min-height: 360px;
+        padding: 24px;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 20px 60px rgb(16 24 40 / 0.24);
+      }
+      .modal.open {
+        display: block;
+      }
+      .upload-zone {
+        display: grid;
+        place-items: center;
+        height: 160px;
+        margin: 16px 0;
+        border: 1px dashed #b9c6df;
+        background: #f7faff;
+      }
+      .upload-zone.has-file {
+        border-color: #1d66d6;
+        background: #edf5ff;
+      }
+      .sku-assistant .next-input {
+        display: inline-flex;
+        align-items: center;
+        width: 520px;
+      }
+      .sku-assistant input {
+        flex: 1 1 auto;
+      }
+      .sku-assistant .next-after {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 34px;
+      }
+      #skuAssistantRun {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+      }
+      h2 {
+        margin-top: 28px;
+      }
+    </style>
+  </head>
+  <body>
+    <aside class="left-helper sell-component-assistant-v2">
+      <h2>填写助手</h2>
+      <p>应用示例：材质 / 纸张版型 / 方型 / 价格取整</p>
+      <button type="button" id="leftPreviewButton">方型</button>
+      <img id="leftPreviewImage" alt="应用示例图片 方型 价格取整" />
+    </aside>
+    <main class="form">
+      <h1>模拟天猫商品发布页</h1>
+      <div class="form-item">
+        <label>商品标题</label>
+        <input id="productTitle" />
+      </div>
+      <div class="form-item">
+        <label>导购标题</label>
+        <input id="guideTitle" />
+      </div>
+      <div class="form-item">
+        <label>商品卖点</label>
+        <textarea id="sellingPoint"></textarea>
+      </div>
+      <div class="form-item">
+        <label>品牌</label>
+        <div class="select" data-field="brand">
+          <button type="button" role="combobox">请选择品牌</button>
+          <div class="options" role="listbox">
+            <div role="option">精臣</div>
+            <div role="option">禹尚</div>
+            <div role="option">得力</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-item">
+        <label>材质</label>
+        <div class="select" data-field="material">
+          <button type="button" role="combobox">请选择材质</button>
+          <div class="options" role="listbox">
+            <div role="option">铜版纸</div>
+            <div role="option">热敏纸</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-item">
+        <label>生产企业</label>
+        <input id="manufacturer" />
+      </div>
+      <div class="form-item">
+        <label>适用品牌</label>
+        <div class="select multi" data-field="applicableBrands">
+          <button type="button" role="combobox">请选择适用品牌</button>
+          <div class="options" role="listbox">
+            <div role="option">GODEx</div>
+            <div role="option">HPRT/汉印</div>
+            <div role="option">佳博</div>
+            <div role="option">科诚</div>
+            <div role="option">Deli/得力</div>
+            <div role="option">brother/兄弟</div>
+            <div role="option">启锐</div>
+            <div role="option">GPRINTER</div>
+            <div role="option">GODEX</div>
+            <div role="option">Argox/立象科技</div>
+            <div role="option">快麦</div>
+            <div role="option">ZEBRA/斑马</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-item">
+        <label>材质特性</label>
+        <div class="select multi" data-field="materialFeatures">
+          <button type="button" role="combobox">请选择材质特性</button>
+          <div class="options" role="listbox">
+            <div role="option">打印清晰</div>
+            <div role="option">粘性强</div>
+            <div role="option">防水</div>
+            <div role="option">防油</div>
+            <div role="option">防刮</div>
+            <div role="option">三防</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-item">
+        <label>纸张版型</label>
+        <div class="select" data-field="paperType">
+          <button type="button" role="combobox">请选择纸张版型</button>
+          <div class="options" role="listbox">
+            <div role="option">圆型</div>
+            <div role="option">方型</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-item">
+        <label>上架时间</label>
+        <div>
+          <label><input type="radio" name="time" value="立刻上架" /> 立刻上架</label>
+          <label><input type="radio" name="time" value="定时上架" /> 定时上架</label>
+        </div>
+      </div>
+      <section class="sku form-item">
+        <label>SKU 价格库存</label>
+        <div>
+          <button type="button" id="importSku">批量导入 Excel</button>
+          <label class="sku-assistant">
+            SKU助手
+            <span class="next-input next-medium search assistant">
+              <input id="skuAssistantInput" placeholder="请输入指令并点击回车发送" />
+              <span class="next-input-inner next-after">
+                <span class="searchExpandedActions-yf2c_s">
+                  <img id="skuAssistantRun" alt="send" class="sendIcon-SoenQ5" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%233b5bff' d='M1 14 15 8 1 2v5l9 1-9 1z'/%3E%3C/svg%3E" />
+                </span>
+              </span>
+            </span>
+          </label>
+          <div id="skuAssistantStatus"></div>
+          <button type="button" id="roundCommand">价格取整</button>
+          <textarea id="skuPaste" rows="5"></textarea>
+          <table>
+            <thead>
+              <tr>
+                <th>颜色分类</th>
+                <th>价格</th>
+                <th>库存</th>
+                <th>商家编码</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>测试规格</td>
+                <td><input class="price" value="18" /></td>
+                <td><input value="500" /></td>
+                <td><input value="SKU001" /></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="sell-sku-table-wrapper-new real-grid">
+            <div class="sku-real-row">
+              <span>【高清三防横版】60*40*800张*3卷试用</span>
+              <span><input id="realLikeA" value="114.12" /></span>
+              <span><input id="realLikeB" value="501" /></span>
+              <span><input value="三防60*40*800张*3卷" /></span>
+              <span>单品</span>
+              <button type="button">查看</button>
+              <button type="button">删除</button>
+            </div>
+            <div class="sku-real-row">
+              <span>【高清三防横版】40*30*800张*45卷/箱</span>
+              <span><input id="realLikeC" value="208.00" /></span>
+              <span><input value="502" /></span>
+              <span><input value="三防40*30*800张*45卷" /></span>
+              <span>单品</span>
+              <button type="button">查看</button>
+              <button type="button">删除</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <h2>销售信息</h2>
+      <div class="form-item">
+        <label>一口价</label>
+        <div><input id="onePrice" /> 元</div>
+      </div>
+      <div class="form-item">
+        <label>商品数量</label>
+        <div><input id="quantity" /> 件</div>
+      </div>
+      <div class="form-item">
+        <label>商家编码</label>
+        <input id="merchantCode" />
+      </div>
+      <div class="form-item">
+        <label>库存扣减方式</label>
+        <div>
+          <label><input type="radio" name="stockReduction" value="拍下减库存" /> 拍下减库存</label>
+          <label><input type="radio" name="stockReduction" value="付款减库存" /> 付款减库存</label>
+        </div>
+      </div>
+      <h2>商品物流信息</h2>
+      <div class="form-item">
+        <label>发货时间</label>
+        <div>
+          <label><input type="radio" name="deliveryTime" value="今日发" /> 今日发</label>
+          <label><input type="radio" name="deliveryTime" value="48小时" /> 48小时</label>
+          <label><input type="radio" name="deliveryTime" value="大于48小时" /> 大于48小时</label>
+        </div>
+      </div>
+      <div class="form-item">
+        <label>提取方式</label>
+        <div>
+          <label><input type="checkbox" name="pickup" value="邮寄" /> 邮寄</label>
+        </div>
+      </div>
+      <div class="form-item sell-component-info-wrapper-component-child sell-location">
+        <label class="name">所在地</label>
+        <div class="sell-component-info-wrapper-component-child-wrap">
+          <label><input type="radio" name="locationScope" value="大陆及港澳台" /> 大陆及港澳台</label>
+          <label><input type="radio" name="locationScope" value="其他国家或地区" /> 其他国家或地区</label>
+          <div class="select next-select next-select-trigger next-select-single next-medium sell-o-select area-select next-inactive next-no-search" data-field="province">
+            <button type="button" role="combobox">请选择省</button>
+            <div class="options" role="listbox">
+              <div role="option">广东</div>
+              <div role="option">浙江</div>
+            </div>
+          </div>
+          <div class="select next-select next-select-trigger next-select-single next-medium sell-o-select area-select next-inactive next-no-search" data-field="city">
+            <button type="button" role="combobox">请选择市</button>
+            <div class="options" role="listbox">
+              <div role="option">杭州</div>
+              <div role="option">金华</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-item">
+        <label>返点比例</label>
+        <div><input id="rebateRate" /> %</div>
+      </div>
+      <div class="actions">
+        <button type="button" id="publishButton">发布</button>
+        <button type="button" id="saveButton">保存草稿</button>
+      </div>
+      <div class="modal" id="skuImportModal" role="dialog" aria-label="批量导入">
+        <h2>批量导入</h2>
+        <div>AI识别导入 <span>模板上传（请先创建sku）</span></div>
+        <label class="upload-zone" id="skuDropzone">
+          <input id="skuFileInput" type="file" accept=".xls,.xlsx,.png,.jpg,.jpeg" hidden />
+          <span id="uploadedFileName">点击 或者 拖动/粘贴文件 到虚线框内上传 下载模板 支持 xls、xlsx、png、jpg、jpeg 类型的文件</span>
+        </label>
+        <button type="button" id="confirmRecognize">确认识别</button>
+        <div id="recognizedSku" hidden>
+          已成功识别1个销售属性，确认无误后请点击添加。
+          <button type="button" id="addSkuAfterCurrent">在当前规格后添加</button>
+        </div>
+        <button type="button" id="cancelImport">取消</button>
+      </div>
+    </main>
+    <script>
+      window.__mockFinalClicks = 0;
+      window.__mockUpload = { fileName: "", files: [], dropCount: 0, changeCount: 0, confirmCount: 0, addCount: 0 };
+      window.__mockSkuAssistant = { value: "", inputCount: 0, changeCount: 0, submitCount: 0 };
+      window.__mockLeftPreviewClicks = 0;
+      document.getElementById("leftPreviewButton").addEventListener("click", () => {
+        window.__mockLeftPreviewClicks += 1;
+      });
+      document.getElementById("leftPreviewImage").addEventListener("click", () => {
+        window.__mockLeftPreviewClicks += 1;
+      });
+      function roundMockPrices() {
+        document.querySelectorAll(".price,#realLikeA,#realLikeC").forEach((input) => {
+          input.value = String(Math.round(Number(input.value)));
+          input.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+      }
+      document.querySelectorAll(".select").forEach((select) => {
+        const button = select.querySelector("[role='combobox']");
+        const multi = select.classList.contains("multi");
+        button.addEventListener("click", () => select.classList.toggle("open"));
+        select.querySelectorAll("[role='option']").forEach((option) => {
+          option.addEventListener("click", () => {
+            if (multi) {
+              option.setAttribute("aria-selected", option.getAttribute("aria-selected") === "true" ? "false" : "true");
+              button.textContent =
+                Array.from(select.querySelectorAll('[aria-selected="true"]'))
+                  .map((item) => item.textContent.trim())
+                  .join(" / ") || button.textContent;
+            } else {
+              select.querySelectorAll("[role='option']").forEach((item) => item.setAttribute("aria-selected", "false"));
+              option.setAttribute("aria-selected", "true");
+              button.textContent = option.textContent.trim();
+              select.classList.remove("open");
+            }
+          });
+        });
+      });
+      document.getElementById("roundCommand").addEventListener("click", () => {
+        roundMockPrices();
+      });
+      const skuAssistantInput = document.getElementById("skuAssistantInput");
+      const skuAssistantRun = document.getElementById("skuAssistantRun");
+      const skuAssistantStatus = document.getElementById("skuAssistantStatus");
+      skuAssistantInput.addEventListener("input", () => {
+        window.__mockSkuAssistant.value = skuAssistantInput.value;
+        window.__mockSkuAssistant.inputCount += 1;
+      });
+      skuAssistantInput.addEventListener("change", () => {
+        window.__mockSkuAssistant.value = skuAssistantInput.value;
+        window.__mockSkuAssistant.changeCount += 1;
+      });
+      skuAssistantInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") skuAssistantRun.click();
+      });
+      skuAssistantRun.addEventListener("click", () => {
+        window.__mockSkuAssistant.value = skuAssistantInput.value;
+        window.__mockSkuAssistant.submitCount += 1;
+        if (/价格取整/.test(skuAssistantInput.value)) {
+          skuAssistantStatus.textContent = "已完成任务分析,正在执行指令...";
+          setTimeout(() => {
+            roundMockPrices();
+            skuAssistantStatus.textContent = "任务完成，2条SKU修改成功";
+          }, 120);
+        }
+      });
+      document.getElementById("importSku").addEventListener("click", () => {
+        document.getElementById("skuImportModal").classList.add("open");
+      });
+      function receiveUpload(files) {
+        const file = files && files[0];
+        if (!file) return;
+        window.__mockUpload.fileName = file.name;
+        window.__mockUpload.files.push({ name: file.name, size: file.size, type: file.type });
+        document.getElementById("skuDropzone").classList.add("has-file");
+        document.getElementById("uploadedFileName").textContent = file.name;
+      }
+      document.getElementById("skuFileInput").addEventListener("change", (event) => {
+        window.__mockUpload.changeCount += 1;
+        receiveUpload(event.target.files);
+      });
+      document.getElementById("skuDropzone").addEventListener("drop", (event) => {
+        event.preventDefault();
+        window.__mockUpload.dropCount += 1;
+        receiveUpload(event.dataTransfer?.files);
+      });
+      document.getElementById("skuDropzone").addEventListener("dragover", (event) => {
+        event.preventDefault();
+      });
+      document.getElementById("confirmRecognize").addEventListener("click", () => {
+        window.__mockUpload.confirmCount += 1;
+        document.getElementById("recognizedSku").hidden = false;
+      });
+      document.getElementById("addSkuAfterCurrent").addEventListener("click", () => {
+        window.__mockUpload.addCount += 1;
+        document.getElementById("skuImportModal").classList.remove("open");
+      });
+      document.getElementById("publishButton").addEventListener("click", () => {
+        window.__mockFinalClicks += 1;
+      });
+      document.getElementById("saveButton").addEventListener("click", () => {
+        window.__mockFinalClicks += 1;
+      });
+    </script>
+  </body>
+</html>
