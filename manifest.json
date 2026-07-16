@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+  "name": "天猫自动上架与SKU图片填充助手",
+  "version": "0.1.41",
+  "description": "天猫/淘宝商品发布页自动上架辅助，包含商品资料、SKU表导入、价格取整、销售物流信息填写，以及已打开页面的SKU图片素材匹配填充。",
+  "action": {
+    "default_title": "打开天猫自动上架右侧面板"
+  },
+  "side_panel": {
+    "default_path": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.tmall.com/*",
+        "https://*.taobao.com/*",
+        "https://*.m.taobao.com/*",
+        "https://*.alibaba.com/*"
+      ],
+      "js": [
+        "lib/sku-image-matcher.js",
+        "content.js",
+        "sku-image-content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "tabs",
+    "webNavigation",
+    "storage",
+    "clipboardWrite",
+    "debugger",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "https://*.tmall.com/*",
+    "https://*.taobao.com/*",
+    "https://*.m.taobao.com/*",
+    "https://*.alibaba.com/*",
+    "file:///*"
+  ],
+  "minimum_chrome_version": "114"
+}

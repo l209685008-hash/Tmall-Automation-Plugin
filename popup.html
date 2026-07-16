@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>天猫上架助手</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div class="titleRow">
+          <h1>天猫上架助手</h1>
+          <span class="guardBadge">发布保护</span>
+        </div>
+        <p id="pageStatus" class="pageStatus" aria-live="polite">正在读取当前页面...</p>
+      </header>
+
+      <div class="panelScroll">
+        <section class="panel workflowPanel">
+          <div class="sectionHead">
+            <h2>上架流程</h2>
+            <button id="diagnose" type="button" class="quietButton">诊断页面</button>
+          </div>
+          <button id="runPrepare" type="button" class="brandPrimary fullButton">全流程准备</button>
+          <div class="actionGrid workflowGrid">
+            <button id="fillText" type="button">填写文本信息</button>
+            <button id="selectAttrs" type="button">选择下拉属性</button>
+            <button id="setTime" type="button">立刻上架时间</button>
+            <button id="applySku" type="button">导入/填充 SKU</button>
+            <button id="roundPrices" type="button">SKU 价格取整</button>
+            <button id="fillSalesInfo" type="button">填写销售信息</button>
+            <button id="fillLogisticsInfo" type="button">填写物流售后</button>
+          </div>
+        </section>
+
+        <section class="panel skuDataPanel">
+          <div class="sectionHead">
+            <h2>SKU 数据</h2>
+          </div>
+          <label class="filePicker" for="skuFile">
+            <span>价格库存表</span>
+            <input id="skuFile" type="file" accept=".xlsx,.xlsm,.csv,.txt" />
+          </label>
+          <div class="actionGrid twoColumns">
+            <button id="loadDefault" type="button">读取默认表</button>
+            <button id="clearSku" type="button" class="dangerQuiet">清空 SKU</button>
+          </div>
+          <p id="skuStatus" class="status" aria-live="polite">尚未导入 SKU 表。</p>
+        </section>
+
+        <section class="panel skuImagePanel">
+          <div class="sectionHead">
+            <h2>SKU 图片填充</h2>
+            <button id="skuImageDiagnosePage" type="button" class="quietButton">诊断</button>
+          </div>
+          <p id="skuImagePagePlanStatus" class="status statusBand" aria-live="polite">切到已打开的发布页或 SKU 图片弹窗后运行。</p>
+          <button id="skuImageFillPage" type="button" class="primary fullButton">按图片名尺寸填充</button>
+          <div class="actionGrid twoColumns">
+            <button id="skuImageOpenDialog" type="button">打开填充弹窗</button>
+            <button id="skuImageScanPage" type="button">扫描网页素材</button>
+            <button id="skuImageCopyPlan" type="button">复制诊断</button>
+            <button id="skuImageFillOrder" type="button" class="secondary" disabled data-permanent-disabled="true" title="已禁用，避免左右顺序不同导致尺寸错配">可见顺序填充</button>
+          </div>
+          <details class="settings">
+            <summary>匹配参数</summary>
+            <div class="settingsGrid">
+              <label class="fieldLabel" for="skuImageMaxRows">
+                <span>最多填充行数</span>
+                <input id="skuImageMaxRows" type="number" min="1" max="999" value="79" />
+              </label>
+              <label class="fieldLabel" for="skuImageConfidence">
+                <span>自动匹配阈值 <strong id="skuImageConfidenceValue">0.78</strong></span>
+                <input id="skuImageConfidence" type="range" min="0.45" max="0.95" step="0.01" value="0.78" />
+              </label>
+            </div>
+          </details>
+        </section>
+
+        <section class="panel logPanel">
+          <div class="sectionHead">
+            <h2>执行记录</h2>
+          </div>
+          <ol id="log" class="log" aria-live="polite"></ol>
+        </section>
+      </div>
+    </main>
+
+    <script src="lib/simple-xlsx.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
